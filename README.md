@@ -21,8 +21,6 @@ Usually, a tool is written to test a specific latency. In this lab, we will beco
 
 ## Table of Contents
 
-
-
 ## Cyclictest
 
 ***cyclictest*** is a benchmarking tool widely used to tune Linux real-time systems.
@@ -146,7 +144,45 @@ The second method of terminating the latency test is to use the -l or --loops fl
 cyclictest --smp -p95 -b 60
 ```
 
-
 ## Hackbench
+From the Hackbench man page:
+
+Hackbench is both a benchmark and a stress test for the Linux kernel scheduler. It's  main job  is  to  create a specified number of pairs of schedulable entities (either threads or traditional processes) which communicate via either sockets or pipes and time how long it takes for each pair to send data back and forth.
+
+Running hackbench without any options will use fork() and send data between senders and receivers via sockets.
+
+* **-s, --datasize=size in bytes** : Changes the size of the data sent between processes
+* **-p, --pipe** : Use Unix pipes rather than sockets
+* **-l, --loops=number of loops** : the number of messages to send and receivers
+* **-T, --threads** : use threads rather than processes
+* **-P, --process** : use fork() on all children
+* **-f, --fds=number of file descriptors** : the number of file descriptors each child should use
+* **-g, --groups=number of groups** : Defines how many groups of senders and receivers should be started
 
 ## Stress
+
+**stress** is a deliberately simple workload generator for POSIX systems. It imposes a configurable amount of CPU, memory, I/O, and disk stress on the system. It is written in C, and is free software licensed under the GPLv2.
+
+Stress is capable of creating CPU bound, I/O bound processes, as well as, processes that are dedicated
+
+Let's create a workload that has two CPU-bound processes, one I/O-bound process, and one memory allocator process.
+
+```console
+ stress --cpu 2 --io 1 --vm 1 --vm-bytes 128M --timeout 10s --verbose
+
+ stress: info: [9372] dispatching hogs: 2 cpu, 1 io, 1 vm, 0 hdd
+ stress: dbug: [9372] (243) using backoff sleep of 12000us
+ stress: dbug: [9372] (262) setting timeout to 10s
+ stress: dbug: [9372] (285) --> hogcpu worker 9373 forked
+ stress: dbug: [9372] (305) --> hogio worker 9374 forked
+ stress: dbug: [9372] (325) --> hogvm worker 9375 forked
+ stress: dbug: [9372] (243) using backoff sleep of 3000us
+ stress: dbug: [9372] (262) setting timeout to 10s
+ stress: dbug: [9372] (285) --> hogcpu worker 9376 forked
+ stress: dbug: [9375] (466) hogvm worker malloced 134217728 bytes
+ stress: dbug: [9372] (382) <-- worker 9374 signalled normally
+ stress: dbug: [9372] (382) <-- worker 9373 signalled normally
+ stress: dbug: [9372] (382) <-- worker 9375 signalled normally
+ stress: dbug: [9372] (382) <-- worker 9376 signalled normally
+ stress: info: [9372] successful run completed in 10s
+```
