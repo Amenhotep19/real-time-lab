@@ -1,4 +1,4 @@
-### Introduction to PREEMPT_RT
+## Introduction to PREEMPT_RT
 
 Linux is a full-featured operating system, originally designed to be used in server or desktop environments. Since then, Linux has evolved and grown to be used in almost all computer areas i.e. embedded systems, cloud servers. Due to its wide popularity, excellent performance and a good protocol stack implementation Linux is the de facto choice for many real-time systems. Linux has the similar design of the UNIX OSs with features like stability, robustness and a secure system.
 
@@ -8,11 +8,11 @@ A Real-Time Operating System (RTOS) should be able to serve an application in re
 
 Here we will talk about the work that lead to the development of the PREEMPT_RT patch and also different ways which allows to enable real-time functionality in the Linux ecosystem.
 
-##### Early Linux Kernels 
+##### Early Linux Kernels
 
 In early Linux kernel (Linux 1.x), tasks could not be preempted once they started executing code in the kernel or in a driver. Preemption could occur only when the task exited the kernel and scheduling took place after the task voluntarily suspended itself in the kernel.
 
-The Linux 2.x kernel series introduced SMP (Symmetric multiprocessing) support. Multiple threads could execute in the kernel as long as they did not attempt to access the same shared data at the same time. The tasks that arrived later had to wait, if multiple tasks competed for a same critical section. In the 2.4.x versions of Linux, the maximum latency is very high. 
+The Linux 2.x kernel series introduced SMP (Symmetric multiprocessing) support. Multiple threads could execute in the kernel as long as they did not attempt to access the same shared data at the same time. The tasks that arrived later had to wait, if multiple tasks competed for a same critical section. In the 2.4.x versions of Linux, the maximum latency is very high.
 The 2.6 kernel series added features and improvements to mainstream which evolved from the need of the embedded systems. This version included a new scheduler feature. This version also had a feature to interrupt a task executing the kernel code (only few parts of the kernel code is pre-emptible).
 The PREEMPT_RT patch which is based on kernel preemption added support for full critical section preemption and interrupt handlers to Linux kernel 2.6.
 
@@ -21,7 +21,7 @@ In 3.4 version of the kernel new scheduling policy Earliest Deadline First(EDF) 
 
 #### Classification of Linux-based RTOSs:
 
-There are various approaches to add real-time features to Linux kernel. These approaches can be grouped into following 
+There are various approaches to add real-time features to Linux kernel. These approaches can be grouped into following
 1. Interrupt Abstraction  
 2. Kernel Preemption approaches
 
@@ -39,7 +39,7 @@ RTAI is a real-time extension to Linux, the implementation is based on RTLinux. 
 
 ##### Xenomai
 
-Xenomai provides a set of RTOS services that can be patched to Linux kernel. Xenomai provides interrupt virtualization by using Adeos nanokernel. It supports features like multithreading, timers, memory allocation and synchronization support.  Xenomai allows running of RT applications in user space or kernel space. Xenomai adopts the concept of multiple entities which can be called as domains. These domains exist on the same machine simultaneously. Xenomai is parted into primary domain and secondary domain. A primary domain runs a real-time component that is named as real-time nucleus and a secondary domain runs Linux OS. 
+Xenomai provides a set of RTOS services that can be patched to Linux kernel. Xenomai provides interrupt virtualization by using Adeos nanokernel. It supports features like multithreading, timers, memory allocation and synchronization support.  Xenomai allows running of RT applications in user space or kernel space. Xenomai adopts the concept of multiple entities which can be called as domains. These domains exist on the same machine simultaneously. Xenomai is parted into primary domain and secondary domain. A primary domain runs a real-time component that is named as real-time nucleus and a secondary domain runs Linux OS.
 
 ##### Advantages
 
@@ -47,9 +47,9 @@ Interrupt Abstraction is effective in reduction of latency. The real-time tasks 
 
 ##### Limitations
 
-As the execution of the real-time tasks happens in the kernel space, both kernel and RT task share same memory space and execute with same privilege. Because of which there is no protection to the memory between them. 
+As the execution of the real-time tasks happens in the kernel space, both kernel and RT task share same memory space and execute with same privilege. Because of which there is no protection to the memory between them.
 
-Real-time tasks are loaded as dynamic modules, due to which if there is any error in the real-time task it may crash the whole system. 
+Real-time tasks are loaded as dynamic modules, due to which if there is any error in the real-time task it may crash the whole system.
 
 Finally, it requires specific drivers to be developed for the real-time system, plus patches to Linux itself in order to work besides it. As the communities are not as big as Linux', this may pose a challenge.
 
@@ -57,7 +57,7 @@ Finally, it requires specific drivers to be developed for the real-time system, 
 
 In 2.4 version of Linux kernel two approaches are proposed for reducing the kernel latency - low latency patch and pre-emptible kernel patch.
 
-* In the low latency patch explicit rescheduling point called as preemption points are inserted in the code that may take long intervals of time for execution. 
+* In the low latency patch explicit rescheduling point called as preemption points are inserted in the code that may take long intervals of time for execution.
 * In the preemption approach a task with higher priority can preempt a lower priority task even if it is running in kernel mode. This is the feature required for real-time systems.
 
 ##### The PREEMPT_RT patchset

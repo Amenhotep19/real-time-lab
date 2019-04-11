@@ -5,22 +5,22 @@
 
 The default Linux kernel includes different scheduling policies, as described in the manpage for `sched`. There are three policies relevant for real-time tasks:
 
-* `SCHED_FIFO` implements a first-in, first-out scheduling algorithm. 
-	* When a SCHED_FIFO task starts running it continues to run until either it is preempted by a higher priority thread, it is blocked by an I/O request or it calls yield function. 
-	* All other tasks of lower priority will not be scheduled until SCHED_FIFO task release the CPU. 
+* **`SCHED_FIFO`** implements a first-in, first-out scheduling algorithm.
+	* When a SCHED_FIFO task starts running it continues to run until either it is preempted by a higher priority thread, it is blocked by an I/O request or it calls yield function. Â
+	* All other tasks of lower priority will not be scheduled until SCHED_FIFO task release the CPU.
 	* Two SCHED_FIFO tasks with same priority cannot preempt each other.
 
-* `SCHED_RR` is identical to the SCHED_FIFO scheduling, the only difference will be the way it handles the processes with the same priority. 
-	* The scheduler assigns each SCHED_RR task a time slice, when the process exhausts its time slice the scheduler moves it to the end of the list of processes at its priority. 
-	* In this manner, SCHED_RR task of a given priority are scheduled in round-robin amongst themselves. 
+* **`SCHED_RR`** is identical to the SCHED_FIFO scheduling, the only difference will be the way it handles the processes with the same priority.
+	* The scheduler assigns each SCHED_RR task a time slice, when the process exhausts its time slice the scheduler moves it to the end of the list of processes at its priority.
+	* In this manner, SCHED_RR task of a given priority are scheduled in round-robin amongst themselves.
 	* If there is only one process at a given priority, the RR scheduling is identical to the FIFO scheduling.
 
-* `SCHED_DEADLINE` is implemented using Earliest Deadline First (EDF) scheduling algorithm, in conjunction with Constant Bandwidth Server (CBS). 
-	* SCHED_DEADLINE policy uses three parameters to schedule tasks - Runtime, Deadline and Period. 
-	* A SCHED_DEADLINE task gets "runtime" nanoseconds of CPU time for every "period" nanoseconds. The "runtime" nanoseconds should be available within "deadline" nanoseconds from the period beginning. 
+* **`SCHED_DEADLINE`** is implemented using Earliest Deadline First (EDF) scheduling algorithm, in conjunction with Constant Bandwidth Server (CBS).
+	* SCHED_DEADLINE policy uses three parameters to schedule tasks - Runtime, Deadline and Period.
+	* A SCHED_DEADLINE task gets "runtime" nanoseconds of CPU time for every "period" nanoseconds. The "runtime" nanoseconds should be available within "deadline" nanoseconds from the period beginning.
 	* Tasks are scheduled using EDF based on the scheduling deadlines(these are calculated every time when the task wakes up).  
 	* Task with the earliest deadline is executed.
-	* SCHED_DEADLINE threads are the highest priority (user controllable) threads in the system. 
+	* SCHED_DEADLINE threads are the highest priority (user controllable) threads in the system.
 	* If any SCHED_DEADLINE thread is runnable, it will preempt any thread scheduled under one of the other policies.
 
 
@@ -28,14 +28,14 @@ The default Linux kernel includes different scheduling policies, as described in
 
 ### Using chrt command
 `chrt command` can be used to set the real time attributes like policy and priority of a process.
-  
+
   Syntax to set scheduling policy to `SCHED_FIFO`
   ```
   chrt --fifo --pid <priority> <pid>
   ```
   priority values for `SCHED_FIFO` can be between 1 and 99
-  
-  Below example will set scheduling attribute to SCHED_FIFO for the process with pid 1823 
+
+  Below example will set scheduling attribute to SCHED_FIFO for the process with pid 1823
   ```
   root@intel-corei7-64:~# chrt --fifo --pid 99 1823  
   ```
@@ -44,8 +44,8 @@ The default Linux kernel includes different scheduling policies, as described in
   chrt -rr --pid <priority> <pid>
   ```
   priority values for `SCHED_RR` can be between 1 and 99
-  
-  Below example will set the scheduling attribute to SCHED_RR and priority 99 for the process with pid 1823 
+
+  Below example will set the scheduling attribute to SCHED_RR and priority 99 for the process with pid 1823
    ```
   root@intel-corei7-64:~# chrt --rr --pid 99 1823  
   ```
@@ -57,19 +57,19 @@ The default Linux kernel includes different scheduling policies, as described in
                   --pid <priority> <pid>
   ```
   priority value for `SCHED_DEADLINE` is 0.
-  
+
   #runtime <= deadline <= period
-  
- 
-  
-  Below example will set scheduling attribute to SCHED_DEADLINE for the process with pid 1823. The runtime, deadline and period are given in nanoseconds. 
+
+
+
+  Below example will set scheduling attribute to SCHED_DEADLINE for the process with pid 1823. The runtime, deadline and period are given in nanoseconds.
   ```
   root@intel-corei7-64:~# chrt --deadline --sched-runtime 10000 \
                                           --sched-deadline 100000 \
                                           --sched-period 1000000  \
                                           --pid 0 1823  
   ```
-  
+
 ### Using system calls `sched_setscheduler` or `sched_setattr()`.
 
   `sched_setscheduler` function currently supporting various scheduling policies and we can use below values to set policies.
@@ -78,42 +78,42 @@ The default Linux kernel includes different scheduling policies, as described in
   2)	SCHED_RR
 
    `sched_setscheduler` can be used to set non-real-time scheduling policies like `SCHED_OTHER`, `SCHED_BATCH` and `SCHED_IDLE`. There is no support for deadline scheduling policy in sched_setscheduler function.
-  
+
   `sched_setscheduler` function sets the scheduling policy, and priority for a thread.<br/>
    ```c
    int sched_setscheduler(pid_t pid, int policy, const struct sched_param *param);
    ```
    The real-time policies that may be specified in policy are: SCHED_FIFO, SCHED_RR
-     
+
   Below example will set the running process with SCHED_RR scheduling with priority as 99
- 
+
   ```c
   struct sched_param param_rr;
   memset(&param_rr, 0, sizeof(param_rr));
-  param_rr.sched_priority = 99; 
-  pid_t pid = getpid(); 
+  param_rr.sched_priority = 99;
+  pid_t pid = getpid();
   if (sched_setscheduler(pid, SCHED_RR, &param_rr))
     perror("sched_setscheduler error:");
   ```
-   
+
   Below example will set the running process with SCHED_FIFO scheduling with priority as 99
-   
+
    ```c
    struct sched_param param_fifo;
    memset(&param_fifo, 0, sizeof(param_fifo));
-   param_fifo.sched_priority = 99; 
+   param_fifo.sched_priority = 99;
    pid_t pid = getpid();
    if (sched_setscheduler(pid, SCHED_FIFO, &param_fifo))
      perror("sched_setscheduler error:");
-   ``` 
-   
+   ```
+
    Linux supports deadline scheduling policy (SCHED_DEADLINE) from kernel version 3.14. To set SCHED_DEADLINE policy to process, we can use `sched_setattr` function.
    ```c
    int sched_setattr(pid_t pid, struct sched_attr *attr, unsigned int flags);
    ```
-   
+
    In the below example the process in execution is assigned with the SCHED_DEADLINE policy. The process gets a runtime of 2 milliseconds for every 9 milliseconds period. The runtime milliseconds should be available within 5 milliseconds of deadline from the period beginning.
-   
+
    ```c
    #define _GNU_SOURCE
    #include <stdint.h>
@@ -135,11 +135,11 @@ The default Linux kernel includes different scheduling policies, as described in
     uint64_t sched_deadline;
     uint64_t sched_period;
   };
-  
+
   int sched_setattr(pid_t pid, const struct sched_attr *attr, unsigned int flags) {
-     return syscall(__NR_sched_setattr, pid, attr, flags); 
+     return syscall(__NR_sched_setattr, pid, attr, flags);
   }
-  
+
   int main() {
 	   unsigned int flags = 0;
 	   int status = -1;
@@ -160,51 +160,51 @@ The default Linux kernel includes different scheduling policies, as described in
 	   return 0;
   }
   ```
-  
+
   ### Using `pthread` functions
    The scheduling policy for threads can be set using the pthread functions `pthread_attr_setschedpolicy`, `pthread_attr_setschedparam`, `pthread_attr_setinheritsched`. The below steps will give a understanding of creating a thread using FIFO scheduling policy using pthread functions.
-   
+
    To create a thread using FIFO scheduling initialize the `pthread_attr_t`(thread attribute object) object using `pthread_attr_init` function.
   ```c
   pthread_attr_t attr_fifo;
   pthread_attr_init(&attr_fifo) ;
-  ``` 
-  
-  After initialization, set the thread attributes object referred to by attr_fifo to SCHED_FIFO(FIFO scheduling policy) using `pthread_attr_setschedpolicy`. 
+  ```
+
+  After initialization, set the thread attributes object referred to by attr_fifo to SCHED_FIFO(FIFO scheduling policy) using `pthread_attr_setschedpolicy`.
   ```c
   pthread_attr_setschedpolicy(&attr_fifo, SCHED_FIFO);
   ```
 
-  Set the priority (can take values between 1-99 for FIFO scheduling) of the thread using the sched_param object and copy the param values to thread attribute using `pthread_attr_setschedparam`. 
+  Set the priority (can take values between 1-99 for FIFO scheduling) of the thread using the sched_param object and copy the param values to thread attribute using `pthread_attr_setschedparam`.
   ```c
   struct sched_param param_fifo;
   param_fifo.sched_priority = 92;
   pthread_attr_setschedparam(&attr_fifo, &param_fifo);
   ```
-  
+
   Set the inherit-scheduler attribute of the thread attribute. The inherit-scheduler attribute determines if new thread takes scheduling attributes from the calling thread or from the attr. To use the scheduling attribute used in attr call the function `pthread_attr_setinheritsched` using `PTHREAD_EXPLICIT_SCHED`.
   ```c
   pthread_attr_setinheritsched(&attr_fifo, PTHREAD_EXPLICIT_SCHED);
   ```
-  
+
   In the next step create the thread by calling `pthread_create` function
   ```c
   pthread_t thread_fifo;
   pthread_create(&thread_fifo, &attr_fifo, thread_function_fifo, NULL);
   ```
-  
+
   The new thread is created with FIFO scheduling scheme.
-  
+
   Find the complete example below
   ```c
    #include <pthread.h>
    #include <stdio.h>
-   
+
    void *thread_function_fifo(void *data) {
    	printf("Inside Thread\n");
    	return NULL;
 	}
-	
+
 	int main(int argc, char* argv[]) {
 		struct sched_param param_fifo;
 		pthread_attr_t attr_fifo;
@@ -241,15 +241,15 @@ The default Linux kernel includes different scheduling policies, as described in
 		return status;
 	}
    ```
-   
-   
+
+
 ## Inspecting Scheduling Configuration
 
 The policy of the running processes and threads can be inspected by using ps and querying for the attribute "policy". It is aliased as "class or cls" as well, and will provide for example
 * TS: for regular time-sharing scheduler (SCHED_OTHER in POSIX 1b)
 * FF: POSIX 1b FIFO
 * RR: POSIX 1b Round Robin
-* #6: deadline (#6 is hard coded integer for SCHED_DEADLINE in kernel sched.h)
+* 6: deadline (#6 is hard coded integer for SCHED_DEADLINE in kernel sched.h)
 
 The attribute for the real-time priority is ```rtprio``` and will display the priority associated to that process or thread.
 
@@ -494,7 +494,7 @@ Example for setting a deadline policy to a task
   chrt --deadline --sched-runtime 10000 --sched-deadline 100000 --sched-period 1000000 -p 0 472
   ```
   Execute below command to see change in the policy of a task
-  
+
   ```
    root@intel-corei7-64:~# ps f -g 0 -o pid,policy,rtprio,cmd
    PID POL RTPRIO CMD
@@ -505,7 +505,7 @@ Example for setting a deadline policy to a task
     476 TS       - /usr/sbin/thermald --no-daemon --dbus-enable
     486 TS       - /usr/sbin/jhid -d
    ```
-   
+
 Condensing this information in a table:
 
 | Prio | Names |
@@ -715,12 +715,12 @@ policy: other/other: loadavg: 0.05 0.01 0.00 1/165 5520
 
 T: 0 ( 5518) P: 0 I:1000 C:  10000 Min:      7 Act:   21 Avg:   23 Max:     460
 ```
-Cyclictest is supporting below scheduler policies 
+Cyclictest is supporting below scheduler policies
 
 * ```other```    - SCHED_OTHER is the most widely used policy. These tasks do not have static priorities. Instead they have a "nice" value ranging from -20 (highest) to +19 (lowest). This scheduling policy is quite different from the real-time policies in that the scheduler aims at a "fair" distribution of the CPU.
-* ```normal```   - also called SCHED_OTHER. 
+* ```normal```   - also called SCHED_OTHER.
 *	```batch```    - SCHED_BATCH is very similar to SCHED_OTHER. The difference is that SCHED_BATCH is optimized for throughput.
-*	```idle```     - SCHED_IDLE is similar to SCHED_OTHER. 
+*	```idle```     - SCHED_IDLE is similar to SCHED_OTHER.
 *	```fifo```     - SCHED_FIFO tasks are allowed to run until they have completed their work or voluntarily yields.
 *	```rr```       - SCHED_RR tasks are allowed to run until they have completed their work,   until they voluntarily yields, or until they have consumed a specified amount of CPU time.
 
@@ -751,16 +751,16 @@ The cyclictest test is used for bench-marking real-time systems, by measuring th
 
 Example for generating CPU workloads
 
-Running in process mode with 15 groups using 30 file descriptors and each sender will pass 100 messages of 256 byes. Use below code to generate workload and run cyclictest parallel in other terminal to observe the latency. 
+Running in process mode with 15 groups using 30 file descriptors and each sender will pass 100 messages of 256 byes. Use below code to generate workload and run cyclictest parallel in other terminal to observe the latency.
 
 Following code is a way to generate CPU load.
 ```c
 #!/bin/sh
 
-#For CPU Load 
+#For CPU Load
 count=1;
 while [[ count -le 5 ]];
-do 
+do
   hackbench -s 256 -l 100 -g 15 -f 15 ;
   count=$((count+1));
   sleep 5;
@@ -773,7 +773,7 @@ root@intel-corei7-64:~# cyclictest -l 10000  //run command in new terminal.
 policy: other/other: loadavg: 20.45 5.45 1.86 1/169 3810
 T: 0 ( 2903) P: 0 I:1000 C:  10000 Min:      7 Act:   22 Avg:   25 Max:    4138          
 ```
-Example for Generating I/O workloads 
+Example for Generating I/O workloads
 
 Taskset will launch ```du command``` with a given CPU affinity, du estimates and displays the disk space used by files from root directory.
 
@@ -792,13 +792,13 @@ policy: other/other: loadavg: 0.10 0.28 0.15 1/159 872
 T: 0 (  869) P: 0 I:1000 C:  10000 Min:      7 Act:   22 Avg:   24 Max:    1998
 ```
 
-## ```cyclictest``` based benchmark with and without neighboring stress 
+## ```cyclictest``` based benchmark with and without neighboring stress
 
 The `rt_bmark` script is used to run the cyclictest based benchmark with neighboring stress. The script is used to capture the interrupt latency by varying the system load. This behavior is attained using cyclictest and stress test tools.
 
 The script will measure latency with different neighboring stress. It uses six types of load for stress test in each pass - `"no stress", "io", "cpu", "hdd", "vm" and "full"(all the four stress parameters are applied)`.
 
-`stress` test is performed by script using following command. 
+`stress` test is performed by script using following command.
 
 ```
 root@intel-corei7-64:~# stress -i 2 -c 2 -d 2 --hdd-bytes 20M -m 2 --vm-bytes 10M
@@ -810,7 +810,7 @@ Where -i or --io create N worker threads to perform I/O sync <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --vm-bytes allocate specified bytes for each workerer thread using malloc <br/>
 
 The above command is run only during the iteration when all the parameters of stress are applied. During the individual stress test only respective stress parameter is applied.
-	  
+
 The `rt_bmark` script runs cyclictest to measure the latency with the below options
 ```
 root@intel-corei7-64:~# cyclictest -S -p 99 -q -i 100 -d 20 -l 30000
@@ -841,9 +841,9 @@ The `rt_bmark` captures minimum, maximum and average latency values for each typ
 *	`Legacy interrupts` – These are also called as fixed interrupts they use older bus technologies in this the interrupts are signaled using one or more external pins which are wired as "out-of-band" i.e. which are separate from the main line of the bus.
 *	`Message-signaled interrupts` – MSI use in-band messages which target addresses in host bridge. These send data along with interrupt message since these are unshared messages these are unique within the system. A PCI (Peripheral Component Interconnect) function request up to 32 MSI messages.
 *	`Extended message-signaled interrupts` – These are an enhanced version of MSIs. The MSI-X support 2048 messages with separate address and data fields for each message.
-  
+
 ## Using MSI latency test
-Now evaluates MSI latency from an i210 PCIe device interrupt source, identified as following 
+Now evaluates MSI latency from an i210 PCIe device interrupt source, identified as following
 ```
 root@intel-corei7-64:~# ethtool -i enp2s0
 driver: igb_avb
@@ -857,7 +857,7 @@ supports-eeprom-access: yes
 supports-register-dump: yes
 supports-priv-flags: no
 ```
-Simply run the test at kernel-level replacing the loaded module by the ``` msi_lat.ko``` and dump report in kernel log message. 
+Simply run the test at kernel-level replacing the loaded module by the ``` msi_lat.ko``` and dump report in kernel log message.
 ```
 root@intel-corei7-64:~# /bin/echo -n 0000:02:00.0 > /sys/bus/pci/drivers/igb_avb/unbind
 root@intel-corei7-64:~# echo '/bin/dmesg -c  &> /dev/null; \
@@ -874,7 +874,7 @@ SMI has the highest priority than all the other interrupts.
 
 A poorly written SMI handler can consume many milliseconds of CPU time which increases latency hence SMI handlers should be written carefully.
 
-To measure the preemption latency `cyclictest` is invoked to create 100000 real-time threads with priority 90 and scheduling policy as SCHED_FIFO. 
+To measure the preemption latency `cyclictest` is invoked to create 100000 real-time threads with priority 90 and scheduling policy as SCHED_FIFO.
 
 ```
 root@intel-corei7-64:~# cyclictest -l100000 -m -Sp90 -i200 -h400
