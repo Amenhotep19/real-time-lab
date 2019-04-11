@@ -25,7 +25,7 @@ Usually, a tool is written to test a specific latency. In this lab, we will beco
 
 ## Cyclictest
 
-cyclictest is a benchmarking tool widely used to tune Linux real-time systems.
+***cyclictest*** is a benchmarking tool widely used to tune Linux real-time systems.
 
 It runs a simple algorithm.
 ```c
@@ -57,25 +57,25 @@ When running without parameters, cyclictest will enter an infinite loop where it
 Looking at the last line, we can already identify some details:
 
 
-T: 0 (1276): it creates a single thread (enumerated as 0), with the identificator 1276. We can instruct cyclictest to create more threads.
+* T: 0 (1276): it creates a single thread (enumerated as 0), with the identificator 1276. We can instruct cyclictest to create more threads.
 
-I: 1000: the time that it will sleep between measurements will be of 1000 us. This is the default value, but we can provide any period for our tests.
+* I: 1000: the time that it will sleep between measurements will be of 1000 us. This is the default value, but we can provide any period for our tests.
 
-C: 3166: it has been executed 3166. This figure will of course be increasing overtime. By default it will run forever, but we can set a defined number of experiments to be run. It is relevant to get enough statistical data.
+* C: 3166: it has been executed 3166. This figure will of course be increasing overtime. By default it will run forever, but we can set a defined number of experiments to be run. It is relevant to get enough statistical data.
 
-Act: 24: it is the actual value measured for the current iteration, in microseconds.
+* Act: 24: it is the actual value measured for the current iteration, in microseconds.
 
-Min: 19, Avg: 25 and Max: 242: are statistic built upon all the actual values recorded over time. That is, the minimum, average and maximum times of the difference between the time when the timer was programmed, and the time when it was actually effective, expressed in microseconds. Actually we should never take the average values into consideration, and focus on the histogram data provided by cyclictest. We will look into that in further examples.
+* Min: 19, Avg: 25 and Max: 242: are statistic built upon all the actual values recorded over time. That is, the minimum, average and maximum times of the difference between the time when the timer was programmed, and the time when it was actually effective, expressed in microseconds. Actually we should never take the average values into consideration, and focus on the histogram data provided by cyclictest. We will look into that in further examples.
 
 The remaining items in the output are:
 
-Policy: other/other: and P: 0: they are job scheduling parameters, indicating the scheduling policy for the execution of the thread, and its priority. The values provided in this example indicate that no real-time scheduling policy has been applied. We will see how we can configure this value.
+* Policy: other/other: and P: 0: they are job scheduling parameters, indicating the scheduling policy for the execution of the thread, and its priority. The values provided in this example indicate that no real-time scheduling policy has been applied. We will see how we can configure this value.
 
-/dev/cpu_dma_latency set to 0us: is a somehow obscure message that indicates that cyclictest has disabled certain power saving configuration options that may impact the latency. The specific behaviour can be configured, but this is the default option.
+* /dev/cpu_dma_latency set to 0us: is a somehow obscure message that indicates that cyclictest has disabled certain power saving configuration options that may impact the latency. The specific behaviour can be configured, but this is the default option.
 
-loadavg: 0.01 0.07 0.02 1/164 1742: this is equivalent to examining the /proc/loadavg system file under Linux. 0.01 0.07 0.02 measure the CPU and IO load averaged over the last 1, 5 and 15 minutes respectively. 1/164. 1742 is the PID of the most recently process created on the system.
+* loadavg: 0.01 0.07 0.02 1/164 1742: this is equivalent to examining the /proc/loadavg system file under Linux. 0.01 0.07 0.02 measure the CPU and IO load averaged over the last 1, 5 and 15 minutes respectively. 1/164. 1742 is the PID of the most recently process created on the system.
 
-If you press Ctrl + C, cyclictest will terminate.
+* If you press Ctrl + C, cyclictest will terminate.
 As usual, cyclictest -h will output the list of options with a small description.
 We are now done with this brief introduction to cyclictest.
 
@@ -88,11 +88,10 @@ cyclictest -A 0
 In a quad-core system the processors are labeled 0 to 3.
 This runs measure thread context switching on processor 0.
 
+To measure latencies, Cyclictest runs a non real-time master thread (scheduling class **SCHED_OTHER**) which starts a defined number of measuring threads with a defined real-time priority (scheduling class **SCHED_FIFO**). The measuring threads are woken up periodically with a defined interval by an expiring timer (cyclic alarm). Subsequently, the difference between the programmed and the effective wake-up time is calculated and handed over to the master thread via shared memory. The master thread tracks the latency values and prints the minimum, maximum, and average latencies after each iteration (default) or once the number of iterations specified is completed (–quiet).
 
+#### Why does **ps** show Cyclictest under a normal policy (SCHED_OTHER) not a real-time policy?
 
-To measure latencies, Cyclictest runs a non real-time master thread (scheduling class SCHED_OTHER) which starts a defined number of measuring threads with a defined real-time priority (scheduling class SCHED_FIFO). The measuring threads are woken up periodically with a defined interval by an expiring timer (cyclic alarm). Subsequently, the difference between the programmed and the effective wake-up time is calculated and handed over to the master thread via shared memory. The master thread tracks the latency values and prints the minimum, maximum, and average latencies after each iteration (default) or once the number of iterations specified is completed (–quiet).
-
-Why does ps show Cyclictest as begin scheduled under a normal policy (SCHED_OTHER) not a real-time policy?
 The Cyclictest task always has one or more threads, several measuring threads which are scheduled under a real-time policy and a main thread (used to aggregate the measurements) which is scheduled under a normal policy. The command ps -ce only shows the main process and not its measuring threads. To also see the measuring threads, use the command ps -eLc | grep cyclic which shows the main-process and all its threads which are indicated as being scheduled under a real-time policy (SCHED_FIFO). An example of output from the correct command is below. The first column is PID (process ID), the second column is LWP (light weight process ID, thread ID), the third column is CLS (scheduling class, scheduling policy), and the fourth column is PRI (priority).
 
 #### Observing the Thread Scheduling Algorithm
@@ -117,6 +116,8 @@ ps -cLe | grep cyclic
 Another useful comand line switch is the --smp switch which starts one thread measurer on each CPU core.
 
 ### Test Across Multi-Symmetric Processors
+This flag will start a thread on each CPU core available to the system.
+
 ```console
 cyclictest --smp
 ```
