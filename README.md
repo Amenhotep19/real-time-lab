@@ -100,7 +100,7 @@ measurement threads, etc., which we're going to use in the next
 section to try and pinpoint excessive latency sources within the
 kernel.
 
-The command launches 5 thread at a priority of 80 and sets the interval of threat to 10,000.
+The command launches 5 thread at a priority of 80 and sets the interval of the threads to 10,000.
 ```console
 ./cyclictest -t 5 -p 80 -n -i 10000
 ```
