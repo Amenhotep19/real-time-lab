@@ -19,10 +19,10 @@ Usually, a tool is written to test a specific latency. In this lab, we will beco
 
 ## Table of Contents
 
-*[Introduction to cyclictest and hackbench](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/README.md)
+* [Introduction to Cyclictest and Hackbench](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/README.md)
 
 ### Concurency
-*[Affinity Tuning](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/concurrency/Affinity.md)
+* [Affinity Tuning](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/concurrency/Affinity.md)
 
 ## Cyclictest
 
