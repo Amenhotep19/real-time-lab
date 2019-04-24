@@ -2,8 +2,6 @@
 
 ## Introduction
 
-introduce the idea of a real-time system
-
 Unexplained delays while processing events are one of the biggest
 problems in real-time operating systems. This labs will bring you through a series of exercises to benchmark and gauge different latencies within the system.
 
@@ -20,6 +18,11 @@ There are many types of latency within an operating system.
 Usually, a tool is written to test a specific latency. In this lab, we will become familiar with a couple of these tools.
 
 ## Table of Contents
+
+*[Introduction to cyclictest and hackbench](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/README.md)
+
+### Concurency
+*[Affinity Tuning](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/concurrency/Affinity.md)
 
 ## Cyclictest
 
