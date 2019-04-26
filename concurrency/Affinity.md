@@ -222,7 +222,7 @@ In our case, the resulting parameters will look like:
 ```isolcpus=2 irqaffinity=0 rcu_nocbs=2 nohz=off nohz_full=2```
 
 Let us edit the following file and add those boot parameters:
-```root@intel-corei7-64:~# vi /media/realroot/loader/entries/boot.conf```
+```root@intel-corei7-64:~# vi /boot/loader/entries/boot.conf```
 
 The modified file should look like:
 ```
