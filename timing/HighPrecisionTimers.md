@@ -284,6 +284,14 @@ Real Time isochronous application thread will be created here.
 
 Find the complete code example below.
 
+To Compile the C file into a binary and run it use the following commands - Asuming you save the code file as timer.c:
+
+```
+gcc -o timer timer.c
+chmod +x timer
+./timer
+```
+
 ```c
 /*Header Files*/
 #include <pthread.h>
