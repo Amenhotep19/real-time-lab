@@ -29,7 +29,6 @@ Usually, a tool is written to test a specific latency. In this lab, we will beco
 
 ### Memory and IO
 * [Memory Management](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/memory-io/MemoryManagement.md)
-* [Cache Allocation Technology](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/memory-io/CacheAllocationTechnology.md)
 
 ### Timing
 * [High Precision Timers](https://github.com/SSG-DRD-IOT/real-time-lab/blob/master/timing/HighPrecisionTimers.md)
